@@ -83,24 +83,19 @@ def main():
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = None
 
-    st.header("Chat with multiple PDFs :books:")
-    user_question = st.text_input("Ask a question about your documents:")
+    st.header("Chat with YouTube video")
+    user_question = st.text_input("Ask a question about the video:")
     if user_question:
         handle_userinput(user_question)
 
     with st.sidebar:
         st.subheader("Youtube URL:")
-        pdf_docs = st.file_uploader(
-            "Upload your PDFs here and click on 'Process'", accept_multiple_files=True)
-        yt_url = st.text_input("Put url here and click on process_1")
-        if st.button("process_1"):
+        yt_url = st.text_input("copy paste video url here and click on process")
+        if st.button("process"):
             with st.spinner("getting transcipt"):
                 #get transcript from url
                 transcript = get_transcipt(yt_url)
-        #if st.button("Process"):
-            #with st.spinner("Processing"):
-                # get pdf text
-                raw_text = get_pdf_text(pdf_docs)
+
 
                 # get the text chunks
                 text_chunks = get_text_chunks(transcript)
