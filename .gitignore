@@ -46,3 +46,6 @@ venv.bak/
 
 # pytype static type analyzer
 .pytype/
+
+#python version
+.python-version
