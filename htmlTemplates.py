@@ -28,7 +28,7 @@ css = '''
 bot_template = '''
 <div class="chat-message bot">
     <div class="avatar">
-        <img src="https://i.ibb.co/F4JdRd9/vecteezy-youtube-logo-png-youtube-logo-transparent-png-youtube-icon-23986704.png" style="max-height: 78px; max-width: 78px; border-radius: 50%; object-fit: cover;">
+        <img src="https://i.ibb.co/HpWsm7C/WALL-E-character.jpg" style="max-height: 78px; max-width: 78px; border-radius: 50%; object-fit: cover;">
     </div>
     <div class="message">{{MSG}}</div>
 </div>
@@ -37,7 +37,7 @@ bot_template = '''
 user_template = '''
 <div class="chat-message user">
     <div class="avatar">
-        <img src="https://i.ibb.co/hdtVKvJ/vecteezy-people-avatar-icon-sign-design-9341235.png">
+        <img src="https://i.ibb.co/JBYpKhj/eve.jpg">
     </div>    
     <div class="message">{{MSG}}</div>
 </div>

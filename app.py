@@ -1,40 +1,46 @@
 import streamlit as st
 from dotenv import load_dotenv
+from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain_community.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_community.chat_models import ChatOpenAI
+from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from htmlTemplates import css, bot_template, user_template
-from langchain_community.llms import _import_huggingface_hub
-from langchain_community.document_loaders import YoutubeLoader
+from langchain.llms import HuggingFaceHub
 
-def get_transcipt(yt_url):
-    loader = YoutubeLoader.from_youtube_url(
-    yt_url, add_video_info=False)
-    text=loader.load()
+def get_pdf_text(pdf_docs):
+    text = ""
+    for pdf in pdf_docs:
+        pdf_reader = PdfReader(pdf)
+        for page in pdf_reader.pages:
+            text += page.extract_text()
     return text
 
-def get_text_chunks(transcript):
+
+def get_text_chunks(text):
     text_splitter = CharacterTextSplitter(
         separator="\n",
         chunk_size=1000,
         chunk_overlap=200,
         length_function=len
     )
-    chunks = text_splitter.split_text(transcript[0].page_content)
+    chunks = text_splitter.split_text(text)
     return chunks
 
 
 def get_vectorstore(text_chunks):
     embeddings = OpenAIEmbeddings()
+    # embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
     return vectorstore
 
 
 def get_conversation_chain(vectorstore):
     llm = ChatOpenAI()
+    # llm = HuggingFaceHub(repo_id="google/flan-t5-xxl", model_kwargs={"temperature":0.5, "max_length":512})
+
     memory = ConversationBufferMemory(
         memory_key='chat_history', return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
@@ -60,7 +66,8 @@ def handle_userinput(user_question):
 
 def main():
     load_dotenv()
-    st.set_page_config(page_title="Chat with YT videos")
+    st.set_page_config(page_title="Chat with multiple PDFs",
+                       page_icon=":books:")
     st.write(css, unsafe_allow_html=True)
 
     if "conversation" not in st.session_state:
@@ -68,22 +75,22 @@ def main():
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = None
 
-    st.header("Chat with YouTube video")
-    user_question = st.text_input("Ask a question about the video:")
+    st.header("Chat with multiple PDFs :books:")
+    user_question = st.text_input("Ask a question about your documents:")
     if user_question:
         handle_userinput(user_question)
 
     with st.sidebar:
-        st.subheader("Youtube URL:")
-        yt_url = st.text_input("copy paste video url here and click on process")
-        if st.button("process"):
-            with st.spinner("getting transcipt"):
-                #get transcript from url
-                transcript = get_transcipt(yt_url)
-
+        st.subheader("Your documents")
+        pdf_docs = st.file_uploader(
+            "Upload your PDFs here and click on 'Process'", accept_multiple_files=True)
+        if st.button("Process"):
+            with st.spinner("Processing"):
+                # get pdf text
+                raw_text = get_pdf_text(pdf_docs)
 
                 # get the text chunks
-                text_chunks = get_text_chunks(transcript)
+                text_chunks = get_text_chunks(raw_text)
 
                 # create vector store
                 vectorstore = get_vectorstore(text_chunks)
