@@ -49,3 +49,5 @@ To use the MultiPDF Chat App, follow these steps:
 4. Load multiple PDF documents into the app by following the provided instructions.
 
 5. Ask questions in natural language about the loaded PDFs using the chat interface.
+
+[Try This on HuggingFace](https://chat-with-pdf-h7t0.onrender.com)
